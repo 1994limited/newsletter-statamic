@@ -1,0 +1,67 @@
+{
+    "name": "1994/newsletter-statamic",
+    "description": "Newsletter sign-ups for Statamic: a form, double opt-in by email, and the list in the Control Panel, ready to download as CSV.",
+    "type": "statamic-addon",
+    "license": "proprietary",
+    "keywords": [
+        "statamic",
+        "statamic-addon",
+        "newsletter",
+        "mailing list",
+        "subscribers",
+        "double opt-in",
+        "csv"
+    ],
+    "authors": [
+        {
+            "name": "1994",
+            "email": "hello@1994.co.uk",
+            "homepage": "https://1994.co.uk"
+        }
+    ],
+    "support": {
+        "email": "hello@1994.co.uk",
+        "issues": "https://github.com/1994limited/newsletter-statamic/issues",
+        "source": "https://github.com/1994limited/newsletter-statamic"
+    },
+    "autoload": {
+        "psr-4": {
+            "NineteenNinetyFour\\Newsletter\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "NineteenNinetyFour\\Newsletter\\Tests\\": "tests"
+        }
+    },
+    "require": {
+        "php": "^8.3",
+        "statamic/cms": "^6.35.1"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.20",
+        "orchestra/testbench": "^10.0|^11.0",
+        "phpunit/phpunit": "^12.0"
+    },
+    "extra": {
+        "statamic": {
+            "name": "Newsletter",
+            "description": "Newsletter sign-ups with double opt-in, and the list in the Control Panel, ready to download as CSV.",
+            "developer": "1994",
+            "developer-url": "https://1994.co.uk"
+        },
+        "laravel": {
+            "providers": [
+                "NineteenNinetyFour\\Newsletter\\ServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pixelfear/composer-dist-plugin": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

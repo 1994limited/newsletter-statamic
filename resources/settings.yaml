@@ -1,0 +1,84 @@
+tabs:
+  form:
+    display: Form
+    sections:
+      -
+        display: 'The sign-up form'
+        instructions: 'Leave a field empty for the default in config/newsletter.php, or the wording in each site''s language.'
+        fields:
+          -
+            handle: consent
+            field:
+              type: toggle
+              display: 'Tick box'
+              instructions: 'A box people must tick, with the wording below next to it. Off: the confirmation email is their consent.'
+          -
+            handle: consent_text
+            field:
+              type: textarea
+              display: 'Consent wording'
+              instructions: 'Next to the tick box, as {{ consent_text }}. Saved with each sign-up, as a record of what people agreed to.'
+              placeholder: 'Email me the newsletter. I can unsubscribe at any time.'
+              if:
+                consent: 'equals true'
+          -
+            handle: ask_name
+            field:
+              type: toggle
+              display: 'Ask for a name'
+              width: 50
+          -
+            handle: require_name
+            field:
+              type: toggle
+              display: 'Name is required'
+              width: 50
+              if:
+                ask_name: 'equals true'
+          -
+            handle: notify
+            field:
+              type: text
+              display: 'Tell these people about new subscribers'
+              instructions: 'Email addresses, separated by commas, emailed each time a sign-up is confirmed.'
+  emails:
+    display: Emails
+    sections:
+      -
+        display: Look
+        fields:
+          -
+            handle: accent_colour
+            field:
+              type: color
+              display: 'Brand colour'
+              instructions: 'The band across the top of the email, its button, and the button on the confirm page. Text on it turns dark or white, whichever reads better.'
+              default: '#1f2937'
+      -
+        display: 'The confirmation email'
+        instructions: 'Sent as soon as someone signs up, with the link that puts them on the list. Placeholders: :site, :email and :name.'
+        fields:
+          -
+            handle: confirm_subject
+            field:
+              type: text
+              display: Subject
+              placeholder: 'Please confirm your subscription'
+          -
+            handle: confirm_heading
+            field:
+              type: text
+              display: Heading
+              placeholder: 'One more step'
+          -
+            handle: confirm_intro
+            field:
+              type: textarea
+              display: Introduction
+              placeholder: 'Please confirm you’d like the :site newsletter at :email.'
+          -
+            handle: confirm_button
+            field:
+              type: text
+              display: Button
+              placeholder: 'Yes, subscribe me'
