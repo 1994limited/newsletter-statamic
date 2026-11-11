@@ -3,6 +3,7 @@
 namespace NineteenNinetyFour\Newsletter\Tags;
 
 use Illuminate\Support\MessageBag;
+use NineteenNinetyFour\Newsletter\FormCaptcha;
 use NineteenNinetyFour\Newsletter\Models\Subscriber;
 use NineteenNinetyFour\Newsletter\Settings;
 use Statamic\Tags\Concerns\RendersForms;
@@ -29,8 +30,8 @@ class NewsletterTags extends Tags
      *
      * {{ newsletter }} … {{ /newsletter }}: your own fields inside the
      * form, with {{ email }}, {{ name }}, {{ consent_text }},
-     * {{ consent_checked }}, {{ success }}, {{ errors }} and
-     * {{ error:email }} (and :name, :consent) to draw them with.
+     * {{ consent_checked }}, {{ captcha }}, {{ success }}, {{ errors }}
+     * and {{ error:email }} (and :name, :consent, :captcha) to draw them with.
      */
     public function index(): string
     {
@@ -50,9 +51,17 @@ class NewsletterTags extends Tags
             $html .= '<input type="hidden" name="'.e($name).'" value="'.e((string) $value).'">';
         }
 
-        $html .= $this->isPair
+        $fields = $this->isPair
             ? $this->parse($data)
             : view(config('newsletter.views.form', 'newsletter::form'), $data + ['button' => e((string) $this->params->get('button', __('newsletter::messages.form.button')))])->render();
+
+        // The captcha goes where the form's markup puts {{ captcha }}, or at
+        // the end when it doesn't (as in views published before there was one).
+        if ($data['captcha'] !== null && ! str_contains($fields, 'data-captcha')) {
+            $fields .= $data['captcha'];
+        }
+
+        $html .= $fields;
 
         $html .= '<div aria-hidden="true" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;">'
             .'<label>'.e(__('newsletter::messages.form.honeypot')).' <input type="text" name="'.e((string) config('newsletter.honeypot', 'website')).'" value="" tabindex="-1" autocomplete="off"></label>'
@@ -106,12 +115,15 @@ class NewsletterTags extends Tags
             'consent' => Settings::consent(),
             'consent_text' => e(Settings::text('consent_text')),
             'consent_checked' => (bool) session()->getOldInput('consent'),
+            // The captcha's widget and script (HTML), or null without one.
+            'captcha' => FormCaptcha::make()?->widget(),
             'success' => $this->success(),
             'errors' => collect($errors?->all() ?? [])->map(fn ($message) => e($message))->all(),
             'error' => [
                 'email' => $errors?->first('email') ? e($errors->first('email')) : null,
                 'name' => $errors?->first('name') ? e($errors->first('name')) : null,
                 'consent' => $errors?->first('consent') ? e($errors->first('consent')) : null,
+                'captcha' => $errors?->first('captcha') ? e($errors->first('captcha')) : null,
             ],
         ];
     }

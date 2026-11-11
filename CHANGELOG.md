@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- A captcha on the form, if you want one: Cloudflare Turnstile, hCaptcha, reCAPTCHA v2 or v3 (set `NEWSLETTER_CAPTCHA` and its keys), or your own. `{{ captcha }}` and `{{ error:captcha }}` for your own fields.
+
 ## 1.0.0 - 2026-11-11
 
 ### Added

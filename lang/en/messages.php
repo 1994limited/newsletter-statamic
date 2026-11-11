@@ -12,6 +12,7 @@ return [
         'email' => 'Please enter a valid email address.',
         'name' => 'Please enter your name.',
         'consent' => 'Please tick the box to say you’d like the newsletter.',
+        'captcha' => 'We couldn’t check you’re not a robot. Please try again.',
         'expired' => 'This link has expired. Please sign up again, and we’ll send you a new one.',
     ],
 

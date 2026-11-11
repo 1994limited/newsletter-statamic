@@ -30,4 +30,11 @@
     </p>
 @endif
 
+@if($captcha)
+    <div class="newsletter-field newsletter-captcha">
+        {!! $captcha !!}
+        @if($error['captcha'])<span class="newsletter-error" role="alert">{!! $error['captcha'] !!}</span>@endif
+    </div>
+@endif
+
 <p><button type="submit">{!! $button !!}</button></p>

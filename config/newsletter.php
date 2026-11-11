@@ -100,6 +100,29 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Captcha
+    |--------------------------------------------------------------------------
+    |
+    | A captcha on the form, as well as the honeypot and limits above:
+    | "turnstile" (Cloudflare), "hcaptcha", "recaptcha" (Google's v2
+    | checkbox), "recaptcha_v3" (scored, nothing to tick), or the class of
+    | your own (implementing NineteenNinetyFour\Captcha\Captcha). Off until a
+    | driver and both keys are set. Captchas need JavaScript, so with one on,
+    | the form no longer works without it.
+    |
+    | score: reCAPTCHA v3 only, the lowest score taken as a person.
+    |
+    */
+
+    'captcha' => [
+        'driver' => env('NEWSLETTER_CAPTCHA'),
+        'site_key' => env('NEWSLETTER_CAPTCHA_SITE_KEY'),
+        'secret_key' => env('NEWSLETTER_CAPTCHA_SECRET_KEY'),
+        'score' => 0.5,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Views
     |--------------------------------------------------------------------------
     |
