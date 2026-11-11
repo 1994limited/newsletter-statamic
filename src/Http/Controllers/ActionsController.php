@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\URL;
+use NineteenNinetyFour\Newsletter\FormCaptcha;
 use NineteenNinetyFour\Newsletter\Http\ReadsText;
 use NineteenNinetyFour\Newsletter\Models\Subscriber;
 use NineteenNinetyFour\Newsletter\Newsletter;
@@ -51,6 +52,12 @@ class ActionsController
 
         if (Settings::consent() && ! $request->boolean('consent')) {
             $errors['consent'] = __('newsletter::messages.errors.consent');
+        }
+
+        // Checked last: a captcha token can be checked only once, and a form
+        // with mistakes in it needn't cost a request to the provider.
+        if (! $errors && ($captcha = FormCaptcha::make()) && ! $captcha->verify($this->text($request, $captcha->field(), 8192), $request->ip())) {
+            $errors['captcha'] = __('newsletter::messages.errors.captcha');
         }
 
         if ($errors) {
