@@ -3,6 +3,7 @@
 namespace NineteenNinetyFour\Newsletter\Tests\Feature;
 
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Mail;
 use NineteenNinetyFour\Newsletter\Events\Confirmed;
 use NineteenNinetyFour\Newsletter\Events\Subscribing;
@@ -292,11 +293,15 @@ class SubscribeTest extends TestCase
         $this->pending('recent@example.com');
         $kept = $this->subscribed('kept@example.com');
 
-        Subscriber::whereIn('id', [$old->id, $kept->id])->update(['created_at' => now()->subDays(40)]);
+        $again = $this->pending('again@example.com');
+        Subscriber::whereIn('id', [$old->id, $kept->id, $again->id])->update(['created_at' => now()->subDays(40), 'updated_at' => now()->subDays(40)]);
+
+        // Signing up again starts the wait again.
+        $this->postJson('/!/newsletter/subscribe', ['email' => 'again@example.com', 'consent' => '1'])->assertOk();
 
         $this->artisan('newsletter:prune')->expectsOutput('1 unconfirmed sign-up deleted.')->assertSuccessful();
 
-        $this->assertSame(['kept@example.com', 'recent@example.com'], Subscriber::orderBy('email')->pluck('email')->all());
+        $this->assertSame(['again@example.com', 'kept@example.com', 'recent@example.com'], Subscriber::orderBy('email')->pluck('email')->all());
 
         config(['newsletter.prune_days' => null]);
         $this->assertSame(0, $this->newsletter()->prune());
@@ -313,5 +318,22 @@ class SubscribeTest extends TestCase
         Addon::get('1994/newsletter-statamic')->settings()->set('consent', true)->save();
         $this->postJson('/!/newsletter/subscribe', ['email' => 'other@example.com', 'consent' => '1'])->assertOk();
         $this->assertSame('Yes please.', Subscriber::where('email', 'other@example.com')->sole()->consent);
+    }
+
+    #[Test]
+    public function the_pages_are_in_the_subscriber_s_language(): void
+    {
+        Lang::addLines([
+            'messages.page.confirm_title' => 'Abonnement bestätigen',
+            'messages.page.confirm_text' => 'Den Newsletter an :email senden?',
+        ], 'de', 'newsletter');
+
+        $subscriber = $this->pending();
+        $subscriber->forceFill(['locale' => 'de'])->save();
+
+        $this->get($subscriber->confirmUrl())
+            ->assertOk()
+            ->assertSee('Abonnement bestätigen')
+            ->assertSee('Den Newsletter an reader@example.com senden?');
     }
 }

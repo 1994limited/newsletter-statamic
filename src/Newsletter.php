@@ -159,7 +159,8 @@ class Newsletter
 
         return Subscriber::query()
             ->where('status', SubscriberStatus::Pending->value)
-            ->where('created_at', '<', now()->subDays((int) $days))
+            // updated_at: signing up again starts the wait again.
+            ->where('updated_at', '<', now()->subDays((int) $days))
             ->delete();
     }
 

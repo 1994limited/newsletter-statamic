@@ -44,7 +44,7 @@ class NewsletterTags extends Tags
     {
         $data = $this->data();
 
-        $html = $this->formOpen(url('!/newsletter/subscribe'), 'POST', ['redirect', 'error_redirect', 'button']);
+        $html = $this->formOpen(route('statamic.newsletter.subscribe'), 'POST', ['redirect', 'error_redirect', 'button']);
 
         foreach (array_filter(['_redirect' => $this->params->get('redirect'), '_error_redirect' => $this->params->get('error_redirect')]) as $name => $value) {
             $html .= '<input type="hidden" name="'.e($name).'" value="'.e((string) $value).'">';

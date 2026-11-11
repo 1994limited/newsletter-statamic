@@ -75,6 +75,7 @@ class ActionsController
     public function confirmPage(Request $request, string $subscriber): Response
     {
         $subscriber = Subscriber::find($subscriber);
+        $this->localise($subscriber);
 
         if (! $subscriber || ! $request->hasValidSignature() || $subscriber->status === SubscriberStatus::Unsubscribed) {
             return $this->page('expired_title', __('newsletter::messages.errors.expired'), $subscriber, status: 403);
@@ -93,6 +94,7 @@ class ActionsController
     public function confirm(Request $request, string $subscriber): Response|RedirectResponse
     {
         $subscriber = Subscriber::find($subscriber);
+        $this->localise($subscriber);
 
         if (! $subscriber || ! $request->hasValidSignature() || $subscriber->status === SubscriberStatus::Unsubscribed) {
             return $this->page('expired_title', __('newsletter::messages.errors.expired'), $subscriber, status: 403);
@@ -110,6 +112,7 @@ class ActionsController
     public function unsubscribePage(string $subscriber): Response
     {
         $subscriber = Subscriber::find($subscriber);
+        $this->localise($subscriber);
 
         if (! $subscriber) {
             return $this->page('unsubscribed_title', __('newsletter::messages.already_unsubscribed'));
@@ -128,6 +131,7 @@ class ActionsController
     public function unsubscribe(Request $request, string $subscriber): Response|RedirectResponse
     {
         $subscriber = Subscriber::find($subscriber);
+        $this->localise($subscriber);
 
         // Deleted since the email: nothing left to stop.
         if (! $subscriber) {
@@ -144,6 +148,16 @@ class ActionsController
         }
 
         return $this->landing('unsubscribed', 'unsubscribed_title', __('newsletter::messages.unsubscribed', ['email' => $subscriber->email]), $subscriber);
+    }
+
+    /**
+     * The pages are in the language of the site they signed up on.
+     */
+    protected function localise(?Subscriber $subscriber): void
+    {
+        $site = $subscriber?->siteObject() ?? Site::current();
+
+        app()->setLocale($subscriber?->locale ?? $site->lang());
     }
 
     /**
@@ -167,8 +181,6 @@ class ActionsController
     protected function page(string $title, string $message, ?Subscriber $subscriber = null, ?array $form = null, int $status = 200): Response
     {
         $site = $subscriber?->siteObject() ?? Site::current();
-
-        app()->setLocale($subscriber?->locale ?? $site->lang());
 
         return response()->view(config('newsletter.views.page', 'newsletter::page'), [
             'title' => __('newsletter::messages.page.'.$title),
